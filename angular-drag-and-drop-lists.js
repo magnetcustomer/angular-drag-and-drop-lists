@@ -307,7 +307,8 @@
        * The dragover event is triggered "every few hundred milliseconds" while an element
        * is being dragged over our list, or over an child element.
        */
-      element.on('dragover', function(event) {
+      element.on('dragover', _.throttle(dragOver, 50, {leading: true, trailing: false}));
+      function dragOver(event) {
         event = event.originalEvent || event;
 
         // Check whether the drop is allowed and determine mime type.
@@ -336,8 +337,11 @@
             } else {
               var isFirstHalf = event.clientY < rect.top + rect.height / 2;
             }
-            listNode.insertBefore(placeholderNode,
-                isFirstHalf ? listItemNode : listItemNode.nextSibling);
+            if(isFirstHalf) {
+              if(listItemNode.previousSibling != placeholderNode) listNode.insertBefore(placeholderNode, listItemNode);
+            } else {
+              if(listItemNode.nextSibling != placeholderNode) listNode.insertBefore(placeholderNode, listItemNode.nextSibling);
+            }
           }
         }
 
@@ -364,7 +368,7 @@
         element.addClass("dndDragover");
         event.stopPropagation();
         return false;
-      });
+      }
 
       /**
        * When the element is dropped, we use the position of the placeholder element as the
