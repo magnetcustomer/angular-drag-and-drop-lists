@@ -94,7 +94,7 @@
       element.on('dragstart', function (event) {
         // stop dragging when selection mode is active in browser
         // if you do not do this, items will vanish in thin air
-        let selObj = window.getSelection();
+        var selObj = window.getSelection();
         if (selObj.rangeCount > 1) {
           selObj.removeAllRanges();
           return false;
@@ -116,20 +116,20 @@
 
         // Internet Explorer and Microsoft Edge don't support custom mime types, see design doc:
         // https://github.com/marceljuenemann/angular-drag-and-drop-lists/wiki/Data-Transfer-Design
-        let item = scope.$eval(attr.dndDraggable);
-        let mimeType = MIME_TYPE + (dndState.itemType ? ('-' + dndState.itemType) : '');
+        var item = scope.$eval(attr.dndDraggable);
+        var mimeType = MIME_TYPE + (dndState.itemType ? ('-' + dndState.itemType) : '');
         try {
           event.dataTransfer.setData(mimeType, angular.toJson(item));
         } catch (e) {
           // Setting a custom MIME type did not work, we are probably in IE or Edge.
-          let data = angular.toJson({item: item, type: dndState.itemType});
+          var data = angular.toJson({item: item, type: dndState.itemType});
           try {
             event.dataTransfer.setData(EDGE_MIME_TYPE, data);
           } catch (e) {
             // We are in Internet Explorer and can only use the Text MIME type. Also note that IE
             // does not allow changing the cursor in the dragover event, therefore we have to choose
             // the one we want to display now by setting effectAllowed.
-            let effectsAllowed = filterEffects(ALL_EFFECTS, dndState.effectAllowed);
+            var effectsAllowed = filterEffects(ALL_EFFECTS, dndState.effectAllowed);
             event.dataTransfer.effectAllowed = effectsAllowed[0];
             event.dataTransfer.setData(MSIE_MIME_TYPE, data);
           }
@@ -143,16 +143,16 @@
 
         // Try setting a proper drag image if triggered on a dnd-handle (won't work in IE).
         if (event._dndHandle && event.dataTransfer.setDragImage) {
-          let elHandle = element[0].querySelectorAll('[dnd-handle]')[0];
-          let offX = (elHandle ? elHandle.offsetLeft : 0) + event.offsetX;
-          let offY = (elHandle ? elHandle.offsetHeight : 0) + event.offsetY;
+          var elHandle = element[0].querySelectorAll('[dnd-handle]')[0];
+          var offX = (elHandle ? elHandle.offsetLeft : 0) + event.offsetX;
+          var offY = (elHandle ? elHandle.offsetHeight : 0) + event.offsetY;
           event.dataTransfer.setDragImage(element[0], offX, offY);
         }
 
         // Invoke dragstart callback and prepare extra callback for dropzone.
         $parse(attr.dndDragstart)(scope, {event: event});
         if (attr.dndCallback) {
-          let callback = $parse(attr.dndCallback);
+          var callback = $parse(attr.dndCallback);
           dndState.callback = function (params) {
             return callback(scope, params || {});
           };
@@ -174,8 +174,8 @@
         // it always sets it to 'none', while Chrome on Linux sometimes sets it to something
         // else when it's supposed to send 'none' (drag operation aborted).
         scope.$apply(function () {
-          let dropEffect = dndState.dropEffect;
-          let cb = {copy: 'dndCopied', link: 'dndLinked', move: 'dndMoved', none: 'dndCanceled'};
+          var dropEffect = dndState.dropEffect;
+          var cb = {copy: 'dndCopied', link: 'dndLinked', move: 'dndMoved', none: 'dndCanceled'};
           $parse(attr[cb[dropEffect]])(scope, {event: event});
           $parse(attr.dndDragend)(scope, {event: event, dropEffect: dropEffect});
         });
@@ -290,12 +290,12 @@
     return function (scope, element, attr) {
       // While an element is dragged over the list, this placeholder element is inserted
       // at the location where the element would be inserted after dropping.
-      let placeholder = getPlaceholderElement();
+      var placeholder = getPlaceholderElement();
       placeholder.remove();
 
-      let placeholderNode = placeholder[0];
-      let listNode = element[0];
-      let listSettings = {};
+      var placeholderNode = placeholder[0];
+      var listNode = element[0];
+      var listSettings = {};
 
       /**
        * The dragenter event is fired when a dragged element or text selection enters a valid drop
@@ -307,7 +307,7 @@
         event = event.originalEvent || event;
 
         // Calculate list properties, so that we don't have to repeat this on every dragover event.
-        let types = attr.dndAllowedTypes && scope.$eval(attr.dndAllowedTypes);
+        var types = attr.dndAllowedTypes && scope.$eval(attr.dndAllowedTypes);
         listSettings = {
           allowedTypes: angular.isArray(types) && types.join('|').toLowerCase().split('|'),
           disabled: attr.dndDisableIf && scope.$eval(attr.dndDisableIf),
@@ -315,7 +315,7 @@
           horizontal: attr.dndHorizontalList && scope.$eval(attr.dndHorizontalList)
         };
 
-        let mimeType = getMimeType(event.dataTransfer.types);
+        var mimeType = getMimeType(event.dataTransfer.types);
         if (!mimeType || !isDropAllowed(getItemType(mimeType))) return true;
         event.preventDefault();
       });
@@ -330,8 +330,8 @@
         event = event.originalEvent || event;
 
         // Check whether the drop is allowed and determine mime type.
-        let mimeType = getMimeType(event.dataTransfer.types);
-        let itemType = getItemType(mimeType);
+        var mimeType = getMimeType(event.dataTransfer.types);
+        var itemType = getItemType(mimeType);
         if (!mimeType || !isDropAllowed(itemType)) return true;
 
         // Make sure the placeholder is shown, which is especially important if the list is empty.
@@ -341,7 +341,7 @@
 
         if (event.target !== listNode) {
           // Try to find the node direct directly below the list node.
-          let listItemNode = event.target;
+          var listItemNode = event.target;
           while (listItemNode.parentNode !== listNode && listItemNode.parentNode) {
             listItemNode = listItemNode.parentNode;
           }
@@ -349,8 +349,8 @@
           if (listItemNode.parentNode === listNode && listItemNode !== placeholderNode) {
             // If the mouse pointer is in the upper half of the list item element,
             // we position the placeholder before the list item, otherwise after it.
-            let rect = listItemNode.getBoundingClientRect();
-            let isFirstHalf;
+            var rect = listItemNode.getBoundingClientRect();
+            var isFirstHalf;
             if (listSettings.horizontal) {
               isFirstHalf = event.clientX < rect.left + rect.width / 2;
             } else {
@@ -367,8 +367,8 @@
         // In IE we set a fake effectAllowed in dragstart to get the correct cursor, we therefore
         // ignore the effectAllowed passed in dataTransfer. We must also not access dataTransfer for
         // drops from external sources, as that throws an exception.
-        let ignoreDataTransfer = mimeType === MSIE_MIME_TYPE;
-        let dropEffect = getDropEffect(event, ignoreDataTransfer);
+        var ignoreDataTransfer = mimeType === MSIE_MIME_TYPE;
+        var dropEffect = getDropEffect(event, ignoreDataTransfer);
         if (dropEffect === 'none') return stopDragover();
 
         // At this point we invoke the callback, which still can disallow the drop.
@@ -398,8 +398,8 @@
         event = event.originalEvent || event;
 
         // Check whether the drop is allowed and determine mime type.
-        let mimeType = getMimeType(event.dataTransfer.types);
-        let itemType = getItemType(mimeType);
+        var mimeType = getMimeType(event.dataTransfer.types);
+        var itemType = getItemType(mimeType);
         if (!mimeType || !isDropAllowed(itemType)) return true;
 
         // The default behavior in Firefox is to interpret the dropped element as URL and
@@ -421,12 +421,12 @@
         }
 
         // Special handling for internal IE drops, see dragover handler.
-        let ignoreDataTransfer = mimeType === MSIE_MIME_TYPE;
-        let dropEffect = getDropEffect(event, ignoreDataTransfer);
+        var ignoreDataTransfer = mimeType === MSIE_MIME_TYPE;
+        var dropEffect = getDropEffect(event, ignoreDataTransfer);
         if (dropEffect === 'none') return stopDragover();
 
         // Invoke the callback, which can transform the transferredObject and even abort the drop.
-        let index = getPlaceholderIndex();
+        var index = getPlaceholderIndex();
         if (attr.dndDrop) {
           data = invokeCallback(attr.dndDrop, event, dropEffect, itemType, index, data);
           if (!data) return stopDragover();
@@ -461,7 +461,7 @@
       element.on('dragleave', function (event) {
         event = event.originalEvent || event;
 
-        let newTarget = document.elementFromPoint(event.clientX, event.clientY);
+        var newTarget = document.elementFromPoint(event.clientX, event.clientY);
         if (listNode.contains(newTarget) && !event._dndPhShown) {
           // Signalize to potential parent lists that a placeholder is already shown.
           event._dndPhShown = true;
@@ -476,7 +476,7 @@
        */
       function getMimeType(types) {
         if (!types) return MSIE_MIME_TYPE; // IE 9 workaround.
-        for (let i = 0; i < types.length; i++) {
+        for (var i = 0; i < types.length; i++) {
           if (types[i] === MSIE_MIME_TYPE || types[i] === EDGE_MIME_TYPE ||
               types[i].substr(0, MIME_TYPE.length) === MIME_TYPE) {
             return types[i];
@@ -514,7 +514,7 @@
        * https://github.com/marceljuenemann/angular-drag-and-drop-lists/wiki/Data-Transfer-Design
        */
       function getDropEffect(event, ignoreDataTransfer) {
-        let effects = ALL_EFFECTS;
+        var effects = ALL_EFFECTS;
         if (!ignoreDataTransfer) {
           effects = filterEffects(effects, event.dataTransfer.effectAllowed);
         }
@@ -574,9 +574,9 @@
        * new li element is created.
        */
       function getPlaceholderElement() {
-        let placeholder;
+        var placeholder;
         angular.forEach(element.children(), function (childNode) {
-          let child = angular.element(childNode);
+          var child = angular.element(childNode);
           if (child.hasClass('dndPlaceholder')) {
             placeholder = child;
           }
@@ -668,6 +668,6 @@
    * - itemType: The item type of the dragged element set via dnd-type. This is needed because IE
    *   and Edge don't support custom mime types that we can use to transfer this information.
    */
-  let dndState = {};
+  var dndState = {};
 
 })(angular.module('dndLists', []));
